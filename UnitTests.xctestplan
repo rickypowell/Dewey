@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "C1351AD5-4534-4A7C-829D-1EA41B6A5473",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Dewey.xcodeproj",
+        "identifier" : "F835EC4A2F7446D200E1BC68",
+        "name" : "DeweyTests"
+      }
+    }
+  ],
+  "version" : 1
+}
