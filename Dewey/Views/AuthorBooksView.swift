@@ -4,6 +4,11 @@ struct AuthorBooksView: View {
     @State private var bookRepo: BookRepository
     let source: BookPayload
     
+    init(bookRepo: BookRepository, source: BookPayload) {
+        self.bookRepo = bookRepo
+        self.source = source
+    }
+    
     var authorName: String {
         source.authorName.first ?? "Author"
     }
