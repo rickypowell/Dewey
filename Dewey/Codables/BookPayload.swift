@@ -2,7 +2,7 @@ struct BookPayload: Codable {
     let title: String
     let authorName: [String]
     let authorKey: [String]
-    let isbn: [String]
+    let isbn: [String]?
     let subject: [String]?
     let firstPublishYear: Int?
     let coverI: Int?
