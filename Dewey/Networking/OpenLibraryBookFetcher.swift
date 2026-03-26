@@ -7,7 +7,7 @@ import Playgrounds
     let query = BookQuery(q: "title:The Odessey of Homer", fields: [.title, .authorName, .authorKey, .isbn, .subject], limit: 15, offset: 0)
     do {
         let result = try await fetcher.fetch(query)
-        let docs = result.docs
+        _ = result.docs
     } catch {
         _ = error
     }
