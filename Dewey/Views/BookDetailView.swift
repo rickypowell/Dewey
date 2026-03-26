@@ -22,6 +22,12 @@ struct BookDetailView: View {
                 AuthorBooksView(
                     source: book,
                 )
+
+                if let subjects = book.subject, !subjects.isEmpty {
+                    SubjectBooksView(
+                        source: book,
+                    )
+                }
             }
             .padding(.vertical, 32)
         }
@@ -54,5 +60,6 @@ fileprivate class MockBookFetcher: BookFetcher {
     }
     .environment(BookRepository(bookFetcher: MockBookFetcher()))
     .environment(\.moreBookByAuthor, BookRepository(bookFetcher: MockBookFetcher()))
+    .environment(\.moreBookBySubject, BookRepository(bookFetcher: MockBookFetcher()))
 }
 #endif

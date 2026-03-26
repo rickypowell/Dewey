@@ -25,6 +25,10 @@ struct DeweyApp: App {
                 .environment(\.moreBookByAuthor, BookRepository(
                     bookFetcher: OpenLibraryBookFetcher(networkData: networkData)
                 ))
+                // needed for the SubjectBooksView that does a separate fetch for books by subject
+                .environment(\.moreBookBySubject, BookRepository(
+                    bookFetcher: OpenLibraryBookFetcher(networkData: networkData)
+                ))
         }
     }
 }
@@ -32,6 +36,11 @@ struct DeweyApp: App {
 extension EnvironmentValues {
     /// separate state for listing books meant to support the feature to fetch by author
     @Entry var moreBookByAuthor = BookRepository(
+        bookFetcher: NoopBookFetcher(),
+    )
+
+    /// separate state for listing books meant to support the feature to fetch by subject
+    @Entry var moreBookBySubject = BookRepository(
         bookFetcher: NoopBookFetcher(),
     )
 }
