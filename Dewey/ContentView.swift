@@ -1,61 +1,85 @@
-//
-//  ContentView.swift
-//  Dewey
-//
-//  Created by Ricky Powell on 3/25/26.
-//
-
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Environment(BookRepository.self) private var bookRepo
+    @State private var searchText = ""
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        NavigationStack {
+            List(bookRepo.books, id: \.isbn) { book in
+                HStack {
+                    if let url = bookRepo.coverImageURL(for: book) {
+                        AsyncImage(url: url) { image in
+                            image.resizable().aspectRatio(contentMode: .fit)
+                        } placeholder: {
+                            Color.gray.opacity(0.3)
+                        }
+                        .frame(width: 50, height: 75)
+                    }
+
+                    VStack(alignment: .leading) {
+                        Text(book.title)
+                            .font(.headline)
+                            .lineLimit(2)
+                        Text(book.authorName.joined(separator: ", "))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                        if let year = book.firstPublishYear {
+                            Text(String(year))
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
                     }
                 }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                .swipeActions {
+                    Button("Add to Reading List", systemImage: "plus.circle", role: .confirm) {
                     }
                 }
             }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            .navigationTitle("Books")
+            .searchable(text: $searchText, prompt: "Search books")
+            .onSubmit(of: .search) {
+                Task {
+                    await bookRepo.fetchBooks(query: searchText)
+                }
+            }
+            .overlay {
+                if bookRepo.isLoading {
+                    ProgressView()
+                } else if let errorMessage = bookRepo.errorMessage {
+                    ContentUnavailableView("Error", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
+                } else if bookRepo.books.isEmpty && !searchText.isEmpty {
+                    ContentUnavailableView.search(text: searchText)
+                }
             }
         }
+    }
+}
+
+#if DEBUG
+fileprivate class MockBookFetcher: BookFetcher {
+    func fetch(_ query: BookQuery) async throws -> BookPagePayload {
+        BookPagePayload(numFound: 3, start: 0, docs: [
+            BookPayload(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: ["Fiction", "Classic Literature"], firstPublishYear: 1925, coverI: 388076),
+            BookPayload(title: "To Kill a Mockingbird", authorName: ["Harper Lee"], authorKey: ["OL502041A"], isbn: ["9780061120084"], subject: ["Fiction", "Southern Gothic"], firstPublishYear: 1960, coverI: 8228691),
+            BookPayload(title: "1984", authorName: ["George Orwell"], authorKey: ["OL118077A"], isbn: ["9780451524935"], subject: ["Dystopian Fiction", "Political Fiction"], firstPublishYear: 1949, coverI: 12818862),
+        ])
+    }
+    func buildFetchURL(_ query: BookQuery) -> URL? {
+        nil
+    }
+    func buildBookCoverImageURL(_ book: BookPayload) -> URL? {
+        nil
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .environment(
+            BookRepository(
+                bookFetcher: MockBookFetcher()
+            )
+        )
 }
+#endif
