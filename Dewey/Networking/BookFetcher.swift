@@ -21,3 +21,12 @@ struct BookQuery {
     /// use for pagination
     let offset: UInt64
 }
+
+/// This is meant to be a placeholder for the EnvironmentValues entry.
+/// It's instance is meant to be replaced at the root of the view hierarchy.
+/// See `DeweyApp` for example.
+class NoopBookFetcher: BookFetcher {
+    func fetch(_ query: BookQuery) async throws -> BookPagePayload { .default }
+    func buildFetchURL(_ query: BookQuery) -> URL? { nil }
+    func buildBookCoverImageURL(_ book: BookPayload) -> URL? { nil }
+}

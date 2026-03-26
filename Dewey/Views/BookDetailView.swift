@@ -18,6 +18,10 @@ struct BookDetailView: View {
                         SubjectScrollView(subjects: subjects)
                     }
                 }
+
+                AuthorBooksView(
+                    source: book,
+                )
             }
             .padding(.vertical, 32)
         }
@@ -49,5 +53,6 @@ fileprivate class MockBookFetcher: BookFetcher {
         ))
     }
     .environment(BookRepository(bookFetcher: MockBookFetcher()))
+    .environment(\.moreBookByAuthor, BookRepository(bookFetcher: MockBookFetcher()))
 }
 #endif

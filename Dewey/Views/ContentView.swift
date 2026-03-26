@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(BookRepository.self) private var bookRepo
+    @Environment(BookRepository.self) var bookRepo
     @State private var searchText = ""
 
     var body: some View {
