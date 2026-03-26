@@ -44,7 +44,7 @@ class BookRepository {
 
         let bookQuery = BookQuery(
             q: query,
-            fields: [.title, .authorName, .authorKey, .isbn, .coverI, .firstPublishYear],
+            fields: [.title, .authorName, .authorKey, .isbn, .coverI, .firstPublishYear, .subject],
             limit: 20,
             offset: 0
         )
