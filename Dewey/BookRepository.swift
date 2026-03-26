@@ -9,12 +9,36 @@ class BookRepository {
     private(set) var errorMessage: String?
 
     private let bookFetcher: any BookFetcher
+    
+    enum Token: CustomStringConvertible {
+        case title(String)
+        case author(String)
+        case subject(String)
+        
+        var description: String {
+            switch self {
+            case .title(let str):
+                "title:\"\(str)\""
+            case .author(let str):
+                "author:\"\(str)\""
+            case .subject(let str):
+                "subject:\"\(str)\""
+            }
+        }
+    }
 
     init(bookFetcher: any BookFetcher) {
         self.bookFetcher = bookFetcher
     }
+    
+    func fetchBooks(tokens: [Token]) async {
+        // results in String "{0.description} {N.description}"
+        let merged = tokens.map { $0.description }.joined(separator: " ")
+        await fetchBooks(query: merged)
+    }
 
     func fetchBooks(query: String) async {
+        books = []
         isLoading = true
         errorMessage = nil
 
