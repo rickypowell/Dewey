@@ -1,4 +1,4 @@
-struct BookPayload: Codable {
+struct BookPayload: Codable, Hashable {
     let title: String
     let authorName: [String]
     let authorKey: [String]

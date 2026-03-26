@@ -10,3 +10,8 @@ struct BookPagePayload: Codable {
         case docs
     }
 }
+
+extension BookPagePayload {
+    static let `default` = BookPagePayload(numFound: 0, start: 0, docs: [])
+    
+}
