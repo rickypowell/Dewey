@@ -31,6 +31,12 @@ class BookRepository {
         self.bookFetcher = bookFetcher
     }
     
+    /// This does not clone the data but the initialized `BookFetcher` is passed to a new
+    /// instance of `BookRepository`
+    func clone() -> BookRepository {
+        BookRepository(bookFetcher: bookFetcher)
+    }
+    
     func fetchBooks(tokens: [Token]) async {
         // results in String "{0.description} {N.description}"
         let merged = tokens.map { $0.description }.joined(separator: " ")

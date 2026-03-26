@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SubjectBooksView: View {
-    @Environment(\.moreBookBySubject) var bookRepo
+    @State var bookRepo: BookRepository
     let source: BookPayload
 
     var subjectName: String {
@@ -23,7 +23,10 @@ struct SubjectBooksView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(bookRepo.books, id: \.self) { book in
-                        SubjectBookCard(bookRepo: bookRepo, book: book)
+                        NavigationLink(value: book) {
+                            SubjectBookCard(bookRepo: bookRepo, book: book)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.horizontal)
@@ -86,9 +89,9 @@ fileprivate class MockBookFetcher: BookFetcher {
 #Preview {
     NavigationStack {
         SubjectBooksView(
-            source: BookPayload(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: ["Fiction", "Classic Literature"], firstPublishYear: 1925, coverI: 388076),
+            bookRepo: BookRepository(bookFetcher: MockBookFetcher()),
+            source: BookPayload(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: ["Fiction", "Classic Literature"], firstPublishYear: 1925, coverI: 388076)
         )
     }
-    .environment(\.moreBookBySubject, BookRepository(bookFetcher: MockBookFetcher()))
 }
 #endif
