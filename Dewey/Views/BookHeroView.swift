@@ -42,6 +42,12 @@ struct BookHeroView: View {
                     .font(.subheadline)
                     .foregroundStyle(.tertiary)
             }
+
+            if let isbn = book.isbn?.first {
+                Text("ISBN \(isbn)")
+                    .font(.subheadline)
+                    .foregroundStyle(.tertiary)
+            }
         }
         .padding(.horizontal)
     }
