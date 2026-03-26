@@ -6,34 +6,41 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            List(bookRepo.books, id: \.isbn) { book in
-                HStack {
-                    if let url = bookRepo.coverImageURL(for: book) {
-                        AsyncImage(url: url) { image in
-                            image.resizable().aspectRatio(contentMode: .fit)
-                        } placeholder: {
-                            Color.gray.opacity(0.3)
+            List {
+                ForEach(bookRepo.books, id: \.isbn) { book in
+                    HStack {
+                        if let url = bookRepo.coverImageURL(for: book) {
+                            AsyncImage(url: url) { phase in
+                                if let image = phase.image {
+                                    image.resizable().aspectRatio(contentMode: .fit)
+                                } else if phase.error != nil {
+                                    Color.red.opacity(0.3)
+                                } else {
+                                    // placeholder and error
+                                    Color.gray.opacity(0.3)
+                                }
+                            }
+                            .frame(width: 50, height: 75)
                         }
-                        .frame(width: 50, height: 75)
-                    }
-
-                    VStack(alignment: .leading) {
-                        Text(book.title)
-                            .font(.headline)
-                            .lineLimit(2)
-                        Text(book.authorName.joined(separator: ", "))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(2)
-                        if let year = book.firstPublishYear {
-                            Text(String(year))
-                                .font(.caption)
-                                .foregroundStyle(.tertiary)
+                        
+                        VStack(alignment: .leading) {
+                            Text(book.title)
+                                .font(.headline)
+                                .lineLimit(2)
+                            Text(book.authorName.joined(separator: ", "))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(2)
+                            if let year = book.firstPublishYear {
+                                Text(String(year))
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
                         }
                     }
-                }
-                .swipeActions {
-                    Button("Add to Reading List", systemImage: "plus.circle", role: .confirm) {
+                    .swipeActions {
+                        Button("Add to Reading List", systemImage: "plus.circle", role: .confirm) {
+                        }
                     }
                 }
             }
@@ -41,7 +48,7 @@ struct ContentView: View {
             .searchable(text: $searchText, prompt: "Search books")
             .onSubmit(of: .search) {
                 Task {
-                    await bookRepo.fetchBooks(query: searchText)
+                    await bookRepo.fetchBooks(tokens: [BookRepository.Token.title(searchText)])
                 }
             }
             .overlay {
