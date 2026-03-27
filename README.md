@@ -6,6 +6,10 @@ Using the OpenLibrary api, you can save selected books to your "Ready List"
 
 To easily run the project, we assume you are proficient enough to find the bundle ID in the Xcode project and change it to your own so that you can run the app on your own device. However, it is possible to run this on the simulator as well. We require the latest Xcode 26.4 to proceed.
 
+## Assumptions
+
+Since we wanted to use the API sparingly, we have limited all requests to the first 20 items as a limit. This can be refactored in the future. This is hardcoded in the `BookRespository` swift file.
+
 ## Project 
 
 I've ensured that some of my favorite project settings were in place before beginning the project to set me up for success.
