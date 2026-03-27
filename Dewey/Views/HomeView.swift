@@ -7,7 +7,7 @@ struct HomeView: View {
                 SearchBookView()
             }
                 
-            Tab("Saved", systemImage: "list.bullet") {
+            Tab("Reading List", systemImage: "list.bullet") {
                 SavedBooksListView()
             }
         }

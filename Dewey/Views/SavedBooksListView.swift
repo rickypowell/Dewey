@@ -26,17 +26,14 @@ struct SavedBooksListView: View {
                             ),
                         )
                     }
+                    .contextMenu {
+                        DeleteBookButton {
+                            deleteBook(book)
+                        }
+                    }
                     .swipeActions {
-                        Button("Delete", systemImage: "trash.circle") {
-                            Task {
-                                do {
-                                    try await bookRepo.delete(book: book)
-                                    books.removeAll(where: { $0 == book })
-                                } catch {
-                                    logger.error("failure to delete book: \(error.localizedDescription)")
-                                    showDeleteError = true
-                                }
-                            }
+                        DeleteBookButton {
+                            deleteBook(book)
                         }
                     }
                 }
@@ -60,6 +57,27 @@ struct SavedBooksListView: View {
             .alert(isPresented: $showDeleteError, error: BookStoreError.couldNotDelete) {
                 // nothing to but acknowledge the error
             }
+        }
+    }
+    
+    func deleteBook(_ book: BookRecord) {
+        Task {
+            do {
+                try await bookRepo.delete(book: book)
+                books.removeAll(where: { $0 == book })
+            } catch {
+                logger.error("failure to delete book: \(error.localizedDescription)")
+                showDeleteError = true
+            }
+        }
+    }
+}
+
+fileprivate struct DeleteBookButton: View {
+    let action: () -> Void
+    var body: some View {
+        Button("Delete", systemImage: "trash", role: .destructive) {
+            action()
         }
     }
 }

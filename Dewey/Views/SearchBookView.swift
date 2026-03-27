@@ -4,6 +4,7 @@ struct SearchBookView: View {
     @Environment(BookRepository.self) var bookRepo
     @State private var searchText = ""
     @State private var previousSearchText = ""
+    @State private var showSaveError = false
 
     var body: some View {
         NavigationStack {
@@ -25,8 +26,14 @@ struct SearchBookView: View {
                             )
                         )
                     }
+                    .contextMenu {
+                        SaveBookButton {
+                            saveBook(book)
+                        }
+                    }
                     .swipeActions {
-                        Button("Add to Reading List", systemImage: "plus.circle", role: .confirm) {
+                        SaveBookButton {
+                            saveBook(book)
                         }
                     }
                 }
@@ -42,6 +49,9 @@ struct SearchBookView: View {
                     await bookRepo.fetchBooks(tokens: [BookRepository.Token.title(searchText)])
                 }
             }
+            .alert(isPresented: $showSaveError, error: BookStoreError.couldNotSave) {
+                // do nothing for now
+            }
             .overlay {
                 if bookRepo.status == .isLoading {
                     ProgressView()
@@ -53,6 +63,25 @@ struct SearchBookView: View {
                     ContentUnavailableView.search(text: previousSearchText)
                 }
             }
+        }
+    }
+    
+    func saveBook(_ book: BookRecord) {
+        Task {
+            do {
+                try await bookRepo.save(book: book)
+            } catch {
+                showSaveError = true
+            }
+        }
+    }
+}
+
+fileprivate struct SaveBookButton: View {
+    let action: () -> Void
+    var body: some View {
+        Button("Add to Reading List", systemImage: "plus.circle", role: .confirm) {
+            action()
         }
     }
 }
