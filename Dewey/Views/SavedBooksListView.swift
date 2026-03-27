@@ -13,47 +13,53 @@ struct SavedBooksListView: View {
     let desc = FetchDescriptor<BookRecord>()
     
     var body: some View {
-        List {
-            ForEach(Array(books.enumerated()), id: \.offset) { (index, book) in
-                BookListItemView(
-                    book: .init(
-                        url: nil,
-                        title: book.title,
-                        authorName: book.authorName.joined(separator: ", "),
-                        firstPublishYear: book.firstPublishYear,
-                    ),
-                )
-                .swipeActions {
-                    Button("Delete", systemImage: "trash.circle") {
-                        Task {
-                            do {
-                                try await bookRepo.delete(book: book)
-                                books.removeAll(where: { $0 == book })
-                            } catch {
-                                logger.error("failure to delete book: \(error.localizedDescription)")
-                                showDeleteError = true
+        NavigationStack {
+            List {
+                ForEach(Array(books.enumerated()), id: \.offset) { (index, book) in
+                    NavigationLink(value: book) {
+                        BookListItemView(
+                            book: .init(
+                                url: bookRepo.coverImageURL(for: book),
+                                title: book.title,
+                                authorName: book.authorName.joined(separator: ", "),
+                                firstPublishYear: book.firstPublishYear,
+                            ),
+                        )
+                    }
+                    .swipeActions {
+                        Button("Delete", systemImage: "trash.circle") {
+                            Task {
+                                do {
+                                    try await bookRepo.delete(book: book)
+                                    books.removeAll(where: { $0 == book })
+                                } catch {
+                                    logger.error("failure to delete book: \(error.localizedDescription)")
+                                    showDeleteError = true
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        .onAppear {
-            Task {
-                do {
-                    books = try await bookRepo.fetchSavedBooks(desc)
-                } catch {
-                    logger.error("failure to fetch saved books: \(error.localizedDescription)")
-                    showReadError = true
+            .onAppear {
+                Task {
+                    do {
+                        books = try await bookRepo.fetchSavedBooks(desc)
+                    } catch {
+                        logger.error("failure to fetch saved books: \(error.localizedDescription)")
+                        showReadError = true
+                    }
                 }
             }
-        }
-        .navigationTitle("Saved Books")
-        .alert(isPresented: $showReadError, error: BookStoreError.couldNotRead) {
+            .navigationDestination(for: BookRecord.self) { book in
+                BookDetailView(book: book)
+            }
+            .alert(isPresented: $showReadError, error: BookStoreError.couldNotRead) {
+                    // nothing to but acknowledge the error
+            }
+            .alert(isPresented: $showDeleteError, error: BookStoreError.couldNotDelete) {
                 // nothing to but acknowledge the error
-        }
-        .alert(isPresented: $showDeleteError, error: BookStoreError.couldNotDelete) {
-            // nothing to but acknowledge the error
+            }
         }
     }
 }
