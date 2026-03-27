@@ -1,16 +1,31 @@
 import Foundation
 import SwiftData
+import os
+
+fileprivate let logger = Logger(subsystem: "com.ricky-powell.Dewey", category: "BookRepository")
 
 /// This Observable can fetch books using it's given `BookFetcher`.
 /// The data is stored in `var book: [BookPayload]` and is initially empty.
 @Observable
 class BookRepository {
     private(set) var books: [BookPayload] = []
-    private(set) var isLoading = false
+    private(set) var status: Status = .initial
     private(set) var errorMessage: String?
 
     private let bookFetcher: any BookFetcher
     private let bookStore: any BookStore
+    
+    /// Represents to the state of the BookRepository
+    /// `initial` -> `isLoading` -> `idle`
+    /// `idle` -> `isLoading`
+    enum Status {
+        /// The starting state of the repository. No fetch has been performed yet.
+        case initial
+        /// Currently fetching books
+        case isLoading
+        /// This means we had either success or failure for fetching books
+        case idle
+    }
     
     enum Token: CustomStringConvertible {
         case title(String)
@@ -48,7 +63,7 @@ class BookRepository {
 
     func fetchBooks(query: String) async {
         books = []
-        isLoading = true
+        status = .isLoading
         errorMessage = nil
 
         let bookQuery = BookQuery(
@@ -61,11 +76,15 @@ class BookRepository {
         do {
             let page = try await bookFetcher.fetch(bookQuery)
             books = page.docs
+        } catch let DecodingError.keyNotFound(key, context) {
+            logger.error("failure to decode book: \(context.debugDescription)")
+            errorMessage = "Failure to decode result key \"\(key.stringValue)\""
         } catch {
+            logger.error("failure to fetch book: \(error)")
             errorMessage = error.localizedDescription
         }
 
-        isLoading = false
+        status = .idle
     }
 
     func coverImageURL(for book: BookPayload) -> URL? {

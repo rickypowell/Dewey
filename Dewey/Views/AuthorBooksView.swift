@@ -21,7 +21,7 @@ struct AuthorBooksView: View {
                     .font(.headline)
                     .padding(.horizontal)
                 
-                if bookRepo.isLoading {
+                if bookRepo.status == .isLoading {
                     ProgressView()
                 }
             }

@@ -3,13 +3,15 @@ import SwiftUI
 struct SearchBookView: View {
     @Environment(BookRepository.self) var bookRepo
     @State private var searchText = ""
+    @State private var previousSearchText = ""
 
     var body: some View {
         NavigationStack {
             List {
                 if bookRepo.books.count > 1 {
                     Section {
-                        Text("Too many results, please narrow your search or choose one of the following")
+                        let resultsText = Text(previousSearchText).bold()
+                        Text("Results for \"\(resultsText).\"\nToo many results, please narrow your search or choose one of the following")
                     }
                 }
                 ForEach(bookRepo.books, id: \.isbn) { book in
@@ -53,20 +55,23 @@ struct SearchBookView: View {
             .navigationDestination(for: BookPayload.self) { book in
                 BookDetailView(book: book)
             }
-            .navigationTitle("Seach")
+            .navigationTitle("Search")
             .searchable(text: $searchText, prompt: "Search books")
             .onSubmit(of: .search) {
                 Task {
+                    previousSearchText = searchText
                     await bookRepo.fetchBooks(tokens: [BookRepository.Token.title(searchText)])
                 }
             }
             .overlay {
-                if bookRepo.isLoading {
+                if bookRepo.status == .isLoading {
                     ProgressView()
                 } else if let errorMessage = bookRepo.errorMessage {
-                    ContentUnavailableView("Error", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
-                } else if bookRepo.books.isEmpty && !searchText.isEmpty {
-                    ContentUnavailableView.search(text: searchText)
+                    ContentUnavailableView("Error when searching for \"\(previousSearchText)\"", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
+                } else if bookRepo.books.isEmpty
+                            && !searchText.isEmpty
+                            && bookRepo.status == .idle {
+                    ContentUnavailableView.search(text: previousSearchText)
                 }
             }
         }
