@@ -9,11 +9,15 @@ struct SavedBooksListView: View {
     @State private var books: [BookRecord] = []
     @State private var showDeleteError = false
     @State private var showReadError = false
+    @State private var showEmptyState = false
     
     let desc = FetchDescriptor<BookRecord>()
     
     var body: some View {
         NavigationStack {
+            if showEmptyState {
+                ContentUnavailableView("Reading List", systemImage: "book", description: Text("Go to the search screen to find books to add to your list."))
+            }
             List {
                 ForEach(Array(books.enumerated()), id: \.offset) { (index, book) in
                     NavigationLink(value: book) {
@@ -42,6 +46,9 @@ struct SavedBooksListView: View {
                 Task {
                     do {
                         books = try await bookRepo.fetchSavedBooks(desc)
+                        if books.isEmpty {
+                            showEmptyState = true
+                        }
                     } catch {
                         logger.error("failure to fetch saved books: \(error.localizedDescription)")
                         showReadError = true

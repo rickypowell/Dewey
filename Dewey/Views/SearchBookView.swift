@@ -13,6 +13,9 @@ struct SearchBookView: View {
 
     var body: some View {
         NavigationStack {
+            if bookRepo.status == .initial {
+                ContentUnavailableView("Search for Books", systemImage: "book", description: Text("Find books by typing in a title."))
+            }
             List {
                 if bookRepo.books.count > 1 {
                     Section {
