@@ -14,6 +14,7 @@ struct BookPayloadTests {
     @Test func decodesFromJSON() throws {
         let json = """
         {
+            "key": "/works/abc",
             "title": "The Lord of the Rings",
             "author_name": ["J. R. R. Tolkien"],
             "author_key": ["OL26320A"],
@@ -26,6 +27,7 @@ struct BookPayloadTests {
 
         let book = try JSONDecoder().decode(BookPayload.self, from: json)
 
+        #expect(book.key == "/works/abc")
         #expect(book.title == "The Lord of the Rings")
         #expect(book.authorName == ["J. R. R. Tolkien"])
         #expect(book.authorKey == ["OL26320A"])
@@ -38,6 +40,7 @@ struct BookPayloadTests {
     @Test func decodesFromJSONWithMissingOptionalFields() throws {
         let json = """
         {
+            "key": "/works/abc",
             "title": "The works of Spenser, in six volumes",
             "author_name": ["Edmund Spenser"],
             "author_key": ["OL26320A"],
@@ -47,6 +50,7 @@ struct BookPayloadTests {
 
         let book = try JSONDecoder().decode(BookPayload.self, from: json)
 
+        #expect(book.key == "/works/abc")
         #expect(book.title == "The works of Spenser, in six volumes")
         #expect(book.subject == nil)
         #expect(book.firstPublishYear == nil)
@@ -55,6 +59,7 @@ struct BookPayloadTests {
 
     @Test func encodesToJSON() throws {
         let book = BookPayload(
+            key: "/works/abc",
             title: "Dune",
             authorName: ["Frank Herbert"],
             authorKey: ["OL34221A"],

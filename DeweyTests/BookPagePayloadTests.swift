@@ -18,6 +18,7 @@ struct BookPagePayloadTests {
             "start": 0,
             "docs": [
                 {
+                    "key": "/works/abc",
                     "title": "The Lord of the Rings",
                     "author_name": ["J. R. R. Tolkien"],
                     "author_key": ["OL26320A"],
@@ -35,6 +36,7 @@ struct BookPagePayloadTests {
         #expect(page.numFound == 629)
         #expect(page.start == 0)
         #expect(page.docs.count == 1)
+        #expect(page.docs[0].key == "/works/abc")
         #expect(page.docs[0].title == "The Lord of the Rings")
         #expect(page.docs[0].subject == ["Fantasy fiction"])
         #expect(page.docs[0].firstPublishYear == 1954)
@@ -47,6 +49,7 @@ struct BookPagePayloadTests {
             start: 0,
             docs: [
                 BookPayload(
+                    key: "/works/abc",
                     title: "Dune",
                     authorName: ["Frank Herbert"],
                     authorKey: ["OL34221A"],
@@ -64,6 +67,7 @@ struct BookPagePayloadTests {
         #expect(decoded.numFound == page.numFound)
         #expect(decoded.start == page.start)
         #expect(decoded.docs.count == 1)
+        #expect(decoded.docs[0].key == "/works/abc")
         #expect(decoded.docs[0].title == "Dune")
     }
 }

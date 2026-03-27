@@ -12,7 +12,7 @@ private class MockBookFetcher: BookFetcher {
     }
 
     func buildFetchURL(_ query: BookQuery) -> URL? { nil }
-    func buildBookCoverImageURL(_ book: BookPayload) -> URL? { nil }
+    func buildBookCoverImageURL(_ coverI: Int?) -> URL? { nil }
 }
 
 struct BookRepositoryTests {

@@ -18,7 +18,7 @@ struct LocalBookStoreTests {
         let context = ModelContext(container)
         let store = LocalBookStore(context: context)
 
-        let book = makeRecord()
+        let book = makeRecord(key: "/works/abc")
         try await store.write([book])
 
         let results = try context.fetch(FetchDescriptor<BookRecord>())
@@ -33,8 +33,8 @@ struct LocalBookStoreTests {
         let store = LocalBookStore(context: context)
 
         let books = [
-            makeRecord(title: "Emma"),
-            makeRecord(title: "Pride and Prejudice"),
+            makeRecord(key: "/works/abc", title: "Emma"),
+            makeRecord(key: "/works/def", title: "Pride and Prejudice"),
         ]
         try await store.write(books)
 
@@ -48,7 +48,7 @@ struct LocalBookStoreTests {
         let context = ModelContext(container)
         let store = LocalBookStore(context: context)
 
-        let book = makeRecord(title: "Sense and Sensibility")
+        let book = makeRecord(key: "/works/abc", title: "Sense and Sensibility")
         context.insert(book)
         try context.save()
 
@@ -74,7 +74,7 @@ struct LocalBookStoreTests {
         let context = ModelContext(container)
         let store = LocalBookStore(context: context)
 
-        let book = makeRecord()
+        let book = makeRecord(key: "/works/abc")
         try await store.write([book])
 
         try await store.delete(book)
@@ -97,11 +97,13 @@ struct BookStoreErrorTests {
 
 /// convenience for creating a `BookRecord`
 private func makeRecord(
+    key: String,
     title: String = "Emma",
     authorName: [String] = ["Jane Austen"],
     authorKey: [String] = ["OL12345A"]
 ) -> BookRecord {
     BookRecord(
+        key: key,
         title: title,
         authorName: authorName,
         authorKey: authorKey,

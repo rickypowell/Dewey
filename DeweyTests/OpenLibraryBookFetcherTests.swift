@@ -27,6 +27,7 @@ struct OpenLibraryBookFetcherTests {
             "start": 0,
             "docs": [
                 {
+                    "key": "/works/ghi",
                     "title": "The Lord of the Rings",
                     "author_name": ["J. R. R. Tolkien"],
                     "author_key": ["OL26320A"],
@@ -43,13 +44,14 @@ struct OpenLibraryBookFetcherTests {
         mock.mockData = json
 
         let fetcher = OpenLibraryBookFetcher(networkData: mock)
-        let query = BookQuery(q: "lord of the rings", fields: [.title, .authorName, .authorKey, .isbn, .subject, .firstPublishYear, .coverI], limit: 10, offset: 0)
+        let query = BookQuery(q: "lord of the rings", fields: [.key, .title, .authorName, .authorKey, .isbn, .subject, .firstPublishYear, .coverI], limit: 10, offset: 0)
 
         let page = try await fetcher.fetch(query)
 
         #expect(page.numFound == 1)
         #expect(page.start == 0)
         #expect(page.docs.count == 1)
+        #expect(page.docs[0].key == "/works/ghi")
         #expect(page.docs[0].title == "The Lord of the Rings")
         #expect(page.docs[0].authorName == ["J. R. R. Tolkien"])
         #expect(page.docs[0].authorKey == ["OL26320A"])
@@ -79,34 +81,16 @@ struct OpenLibraryBookFetcherTests {
 
     @Test func buildBookCoverImageURL() {
         let fetcher = OpenLibraryBookFetcher(networkData: MockNetworkData())
-        let book = BookPayload(
-            title: "Dune",
-            authorName: ["Frank Herbert"],
-            authorKey: ["OL34221A"],
-            isbn: ["0441172717"],
-            subject: nil,
-            firstPublishYear: 1965,
-            coverI: 258027
-        )
 
-        let url = fetcher.buildBookCoverImageURL(book)
+        let url = fetcher.buildBookCoverImageURL(258027)
 
         #expect(url?.absoluteString == "https://covers.openlibrary.org/b/id/258027-M.jpg")
     }
 
     @Test func buildBookCoverImageURLReturnsNilWhenCoverIsMissing() {
         let fetcher = OpenLibraryBookFetcher(networkData: MockNetworkData())
-        let book = BookPayload(
-            title: "Dune",
-            authorName: ["Frank Herbert"],
-            authorKey: ["OL34221A"],
-            isbn: ["0441172717"],
-            subject: nil,
-            firstPublishYear: 1965,
-            coverI: nil
-        )
 
-        let url = fetcher.buildBookCoverImageURL(book)
+        let url = fetcher.buildBookCoverImageURL(nil)
 
         #expect(url == nil)
     }
