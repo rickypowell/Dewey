@@ -31,7 +31,7 @@ struct SearchBookView: View {
                     }
                 }
             }
-            .navigationDestination(for: BookPayload.self) { book in
+            .navigationDestination(for: BookRecord.self) { book in
                 BookDetailView(book: book)
             }
             .navigationTitle("Search")
@@ -69,7 +69,7 @@ fileprivate class MockBookFetcher: BookFetcher {
     func buildFetchURL(_ query: BookQuery) -> URL? {
         nil
     }
-    func buildBookCoverImageURL(_ book: BookPayload) -> URL? {
+    func buildBookCoverImageURL(_ coverI: Int?) -> URL? {
         nil
     }
 }

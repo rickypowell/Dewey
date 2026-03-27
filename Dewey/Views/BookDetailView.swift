@@ -6,7 +6,7 @@ fileprivate let logger = Logger(subsystem: "com.ricky-powell.Dewey", category: "
 
 struct BookDetailView: View {
     @Environment(BookRepository.self) private var bookRepo
-    let book: BookPayload
+    let book: BookRecord
     @State private var bookSaved = false
     @State private var showSaveError = false
 
@@ -71,21 +71,22 @@ fileprivate class MockBookFetcher: BookFetcher {
         BookPagePayload.default
     }
     func buildFetchURL(_ query: BookQuery) -> URL? { nil }
-    func buildBookCoverImageURL(_ book: BookPayload) -> URL? { nil }
+    func buildBookCoverImageURL(_ coverI: Int?) -> URL? { nil }
 }
 
 fileprivate typealias MockBookStore = NoopBookStore
 
 #Preview {
     NavigationStack {
-        BookDetailView(book: BookPayload(
+        BookDetailView(book: BookRecord(
             title: "The Great Gatsby",
             authorName: ["F. Scott Fitzgerald"],
             authorKey: ["OL27349A"],
             isbn: ["9780743273565"],
             subject: ["Fiction", "Classic Literature", "American Literature", "Jazz Age"],
             firstPublishYear: 1925,
-            coverI: 388076
+            coverI: 388076,
+            timestamp: Date(),
         ))
     }
     .environment(BookRepository(bookFetcher: MockBookFetcher(), bookStore: MockBookStore()))

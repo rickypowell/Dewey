@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SubjectBooksView: View {
     @State var bookRepo: BookRepository
-    let source: BookPayload
+    let source: BookRecord
 
     var subjectName: String {
         source.subject?.first ?? "Subject"
@@ -40,7 +40,7 @@ struct SubjectBooksView: View {
 
 private struct SubjectBookCard: View {
     let bookRepo: BookRepository
-    let book: BookPayload
+    let book: BookRecord
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -83,7 +83,7 @@ fileprivate class MockBookFetcher: BookFetcher {
         ])
     }
     func buildFetchURL(_ query: BookQuery) -> URL? { nil }
-    func buildBookCoverImageURL(_ book: BookPayload) -> URL? { nil }
+    func buildBookCoverImageURL(_ coverI: Int?) -> URL? { nil }
 }
 
 fileprivate typealias MockBookStore = NoopBookStore
@@ -92,7 +92,7 @@ fileprivate typealias MockBookStore = NoopBookStore
     NavigationStack {
         SubjectBooksView(
             bookRepo: BookRepository(bookFetcher: MockBookFetcher(), bookStore: MockBookStore()),
-            source: BookPayload(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: ["Fiction", "Classic Literature"], firstPublishYear: 1925, coverI: 388076)
+            source: BookRecord(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: ["Fiction", "Classic Literature"], firstPublishYear: 1925, coverI: 388076, timestamp: Date())
         )
     }
 }

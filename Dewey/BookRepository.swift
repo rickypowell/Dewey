@@ -8,7 +8,7 @@ fileprivate let logger = Logger(subsystem: "com.ricky-powell.Dewey", category: "
 /// The data is stored in `var book: [BookPayload]` and is initially empty.
 @Observable
 class BookRepository {
-    private(set) var books: [BookPayload] = []
+    private(set) var books: [BookRecord] = []
     private(set) var status: Status = .initial
     private(set) var errorMessage: String?
 
@@ -75,7 +75,7 @@ class BookRepository {
 
         do {
             let page = try await bookFetcher.fetch(bookQuery)
-            books = page.docs
+            books = page.docs.map { BookRecord(from: $0) }
         } catch let DecodingError.keyNotFound(key, context) {
             logger.error("failure to decode book: \(context.debugDescription)")
             errorMessage = "Failure to decode result key \"\(key.stringValue)\""
@@ -87,13 +87,12 @@ class BookRepository {
         status = .idle
     }
 
-    func coverImageURL(for book: BookPayload) -> URL? {
-        bookFetcher.buildBookCoverImageURL(book)
+    func coverImageURL(for book: BookRecord) -> URL? {
+        bookFetcher.buildBookCoverImageURL(book.coverI)
     }
     
     /// Inserts/Saves a record of `BookRecord` given the `BookPayload` in the store
-    func save(book: BookPayload) async throws {
-        let record = BookRecord(from: book)
+    func save(book record: BookRecord) async throws {
         try await bookStore.write([record])
     }
     

@@ -8,7 +8,7 @@ protocol BookFetcher {
     func buildFetchURL(_ query: BookQuery) -> URL?
     /// Builds and returns the URL expected for a book cover image to be displayed
     /// in the UI.
-    func buildBookCoverImageURL(_ book: BookPayload) -> URL?
+    func buildBookCoverImageURL(_ coverI: Int?) -> URL?
 }
 
 struct BookQuery {
@@ -28,5 +28,5 @@ struct BookQuery {
 class NoopBookFetcher: BookFetcher {
     func fetch(_ query: BookQuery) async throws -> BookPagePayload { .default }
     func buildFetchURL(_ query: BookQuery) -> URL? { nil }
-    func buildBookCoverImageURL(_ book: BookPayload) -> URL? { nil }
+    func buildBookCoverImageURL(_ coverI: Int?) -> URL? { nil }
 }

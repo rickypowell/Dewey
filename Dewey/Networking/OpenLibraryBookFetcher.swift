@@ -66,8 +66,8 @@ class OpenLibraryBookFetcher: BookFetcher {
 
     /// Assumes that we will always be fetching medium ("M") size images
     /// and the key is always "id" which corresponds to the `cover_i`.
-    func buildBookCoverImageURL(_ book: BookPayload) -> URL? {
-        guard let coverI = book.coverI else { return nil }
+    func buildBookCoverImageURL(_ coverI: Int?) -> URL? {
+        guard let coverI else { return nil }
         return URL(string: "https://covers.openlibrary.org/b/id/\(coverI)-M.jpg")
     }
 }

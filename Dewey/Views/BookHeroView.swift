@@ -2,7 +2,7 @@ import SwiftUI
 
 struct BookHeroView: View {
     let bookRepo: BookRepository
-    let book: BookPayload
+    let book: BookRecord
 
     var body: some View {
         if let url = bookRepo.coverImageURL(for: book) {
@@ -59,7 +59,7 @@ fileprivate class MockBookFetcher: BookFetcher {
         BookPagePayload.default
     }
     func buildFetchURL(_ query: BookQuery) -> URL? { nil }
-    func buildBookCoverImageURL(_ book: BookPayload) -> URL? { nil }
+    func buildBookCoverImageURL(_ coverI: Int?) -> URL? { nil }
 }
 
 fileprivate typealias MockBookStore = NoopBookStore
@@ -67,14 +67,15 @@ fileprivate typealias MockBookStore = NoopBookStore
 #Preview(traits: .sizeThatFitsLayout) {
     BookHeroView(
         bookRepo: BookRepository(bookFetcher: MockBookFetcher(), bookStore: MockBookStore()),
-        book: BookPayload(
+        book: BookRecord(
             title: "The Great Gatsby",
             authorName: ["F. Scott Fitzgerald"],
             authorKey: ["OL27349A"],
             isbn: ["9780743273565"],
             subject: nil,
             firstPublishYear: 1925,
-            coverI: nil
+            coverI: nil,
+            timestamp: Date(),
         )
     )
 }

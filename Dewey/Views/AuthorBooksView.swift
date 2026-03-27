@@ -3,9 +3,9 @@ import SwiftData
 
 struct AuthorBooksView: View {
     @State private var bookRepo: BookRepository
-    let source: BookPayload
+    let source: BookRecord
     
-    init(bookRepo: BookRepository, source: BookPayload) {
+    init(bookRepo: BookRepository, source: BookRecord) {
         self.bookRepo = bookRepo
         self.source = source
     }
@@ -46,7 +46,7 @@ struct AuthorBooksView: View {
 
 private struct AuthorBookCard: View {
     let bookRepo: BookRepository
-    let book: BookPayload
+    let book: BookRecord
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -90,7 +90,7 @@ fileprivate class MockBookFetcher: BookFetcher {
         ])
     }
     func buildFetchURL(_ query: BookQuery) -> URL? { nil }
-    func buildBookCoverImageURL(_ book: BookPayload) -> URL? { nil }
+    func buildBookCoverImageURL(_ coverI: Int?) -> URL? { nil }
 }
 
 fileprivate typealias MockBookStore = NoopBookStore
@@ -99,7 +99,7 @@ fileprivate typealias MockBookStore = NoopBookStore
     NavigationStack {
         AuthorBooksView(
             bookRepo: BookRepository(bookFetcher: MockBookFetcher(), bookStore: MockBookStore()),
-            source: BookPayload(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: nil, firstPublishYear: 1925, coverI: 388076)
+            source: BookRecord(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: nil, firstPublishYear: 1925, coverI: 388076, timestamp: Date())
         )
     }
 }
