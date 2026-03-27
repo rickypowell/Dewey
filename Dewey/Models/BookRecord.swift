@@ -12,6 +12,7 @@ extension BookRecord {
     /// Transforms `BookPayload` to `BookRecord`
     convenience init(from payload: BookPayload) {
         self.init(
+            key: payload.key,
             title: payload.title,
             authorName: payload.authorName,
             authorKey: payload.authorKey,

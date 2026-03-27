@@ -78,8 +78,8 @@ private struct SubjectBookCard: View {
 fileprivate class MockBookFetcher: BookFetcher {
     func fetch(_ query: BookQuery) async throws -> BookPagePayload {
         BookPagePayload(numFound: 2, start: 0, docs: [
-            BookPayload(title: "To Kill a Mockingbird", authorName: ["Harper Lee"], authorKey: ["OL44247A"], isbn: ["9780061120084"], subject: ["Fiction"], firstPublishYear: 1960, coverI: 8228691),
-            BookPayload(title: "1984", authorName: ["George Orwell"], authorKey: ["OL118077A"], isbn: ["9780451524935"], subject: ["Fiction"], firstPublishYear: 1949, coverI: 153710),
+            BookPayload(key: "/works/abc", title: "To Kill a Mockingbird", authorName: ["Harper Lee"], authorKey: ["OL44247A"], isbn: ["9780061120084"], subject: ["Fiction"], firstPublishYear: 1960, coverI: 8228691),
+            BookPayload(key: "/works/def", title: "1984", authorName: ["George Orwell"], authorKey: ["OL118077A"], isbn: ["9780451524935"], subject: ["Fiction"], firstPublishYear: 1949, coverI: 153710),
         ])
     }
     func buildFetchURL(_ query: BookQuery) -> URL? { nil }
@@ -92,7 +92,7 @@ fileprivate typealias MockBookStore = NoopBookStore
     NavigationStack {
         SubjectBooksView(
             bookRepo: BookRepository(bookFetcher: MockBookFetcher(), bookStore: MockBookStore()),
-            source: BookRecord(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: ["Fiction", "Classic Literature"], firstPublishYear: 1925, coverI: 388076, timestamp: Date())
+            source: BookRecord(key: "/works/hij", title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: ["Fiction", "Classic Literature"], firstPublishYear: 1925, coverI: 388076, timestamp: Date())
         )
     }
 }

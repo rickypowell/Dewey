@@ -10,6 +10,8 @@ enum DeweySchemaV1: VersionedSchema {
 
     @Model
     class BookRecordV1 {
+        @Attribute(.unique)
+        var key: String
         var title: String
         var authorName: [String]
         var authorKey: [String]
@@ -19,7 +21,8 @@ enum DeweySchemaV1: VersionedSchema {
         var coverI: Int?
         var timestamp: Date
 
-        init(title: String, authorName: [String], authorKey: [String], isbn: [String]?, subject: [String]?, firstPublishYear: Int?, coverI: Int?, timestamp: Date) {
+        init(key: String, title: String, authorName: [String], authorKey: [String], isbn: [String]?, subject: [String]?, firstPublishYear: Int?, coverI: Int?, timestamp: Date) {
+            self.key = key
             self.title = title
             self.authorName = authorName
             self.authorKey = authorKey

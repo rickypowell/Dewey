@@ -1,10 +1,15 @@
 import SwiftUI
+import SwiftData
+import os
+
+fileprivate let logger = Logger(subsystem: "com.ricky-powell.Dewey", category: "SearchBookView")
 
 struct SearchBookView: View {
     @Environment(BookRepository.self) var bookRepo
     @State private var searchText = ""
     @State private var previousSearchText = ""
     @State private var showSaveError = false
+    @State private var savedBooks: [BookRecord] = []
 
     var body: some View {
         NavigationStack {
@@ -27,13 +32,19 @@ struct SearchBookView: View {
                         )
                     }
                     .contextMenu {
-                        SaveBookButton {
-                            saveBook(book)
+                        if !isSaveButtonDisabled(book) {
+                            SaveBookButton {
+                                saveBook(book)
+                                updateSavedBooks()
+                            }
                         }
                     }
                     .swipeActions {
-                        SaveBookButton {
-                            saveBook(book)
+                        if !isSaveButtonDisabled(book) {
+                            SaveBookButton {
+                                saveBook(book)
+                                updateSavedBooks()
+                            }
                         }
                     }
                 }
@@ -42,6 +53,9 @@ struct SearchBookView: View {
                 BookDetailView(book: book)
             }
             .navigationTitle("Search")
+            .onAppear {
+                updateSavedBooks()
+            }
             .searchable(text: $searchText, prompt: "Search books")
             .onSubmit(of: .search) {
                 Task {
@@ -75,6 +89,22 @@ struct SearchBookView: View {
             }
         }
     }
+    
+    func isSaveButtonDisabled(_ book: BookRecord) -> Bool {
+        savedBooks.first(where: { $0.key == book.key }) != nil
+    }
+    
+    /// refreshes the `savedBooks` state
+    func updateSavedBooks() {
+        Task {
+            do {
+                let desc = FetchDescriptor<BookRecord>()
+                savedBooks = try await bookRepo.fetchSavedBooks(desc)
+            } catch {
+                logger.error("failure to fetch saved books: \(error)")
+            }
+        }
+    }
 }
 
 fileprivate struct SaveBookButton: View {
@@ -90,9 +120,9 @@ fileprivate struct SaveBookButton: View {
 fileprivate class MockBookFetcher: BookFetcher {
     func fetch(_ query: BookQuery) async throws -> BookPagePayload {
         BookPagePayload(numFound: 3, start: 0, docs: [
-            BookPayload(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: ["Fiction", "Classic Literature"], firstPublishYear: 1925, coverI: 388076),
-            BookPayload(title: "To Kill a Mockingbird", authorName: ["Harper Lee"], authorKey: ["OL502041A"], isbn: ["9780061120084"], subject: ["Fiction", "Southern Gothic"], firstPublishYear: 1960, coverI: 8228691),
-            BookPayload(title: "1984", authorName: ["George Orwell"], authorKey: ["OL118077A"], isbn: ["9780451524935"], subject: ["Dystopian Fiction", "Political Fiction"], firstPublishYear: 1949, coverI: 12818862),
+            BookPayload(key: "/works/abc", title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: ["Fiction", "Classic Literature"], firstPublishYear: 1925, coverI: 388076),
+            BookPayload(key: "/works/def", title: "To Kill a Mockingbird", authorName: ["Harper Lee"], authorKey: ["OL502041A"], isbn: ["9780061120084"], subject: ["Fiction", "Southern Gothic"], firstPublishYear: 1960, coverI: 8228691),
+            BookPayload(key: "/works/ghi", title: "1984", authorName: ["George Orwell"], authorKey: ["OL118077A"], isbn: ["9780451524935"], subject: ["Dystopian Fiction", "Political Fiction"], firstPublishYear: 1949, coverI: 12818862),
         ])
     }
     func buildFetchURL(_ query: BookQuery) -> URL? {

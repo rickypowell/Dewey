@@ -41,6 +41,25 @@ struct BookDetailView: View {
         }
         .navigationTitle(book.title)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            Task {
+                do {
+                    // if we find the book in the saved list,
+                    // then we want to disable to the "Save" button in the toolbar
+                    let bookKey = self.book.key
+                    var desc = FetchDescriptor<BookRecord>(
+                        predicate: #Predicate { $0.key == bookKey }
+                    )
+                    desc.fetchLimit = 1
+                    let books = try await bookRepo.fetchSavedBooks(desc)
+                    // if the query result is empty, that means the book is already saved
+                    let isSaved = !books.isEmpty
+                    bookSaved = isSaved
+                } catch {
+                    logger.error("failure to fetch saved books: \(error)")
+                }
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -79,6 +98,7 @@ fileprivate typealias MockBookStore = NoopBookStore
 #Preview {
     NavigationStack {
         BookDetailView(book: BookRecord(
+            key: "/works/abc",
             title: "The Great Gatsby",
             authorName: ["F. Scott Fitzgerald"],
             authorKey: ["OL27349A"],

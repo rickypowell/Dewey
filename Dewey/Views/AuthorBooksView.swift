@@ -84,9 +84,9 @@ private struct AuthorBookCard: View {
 fileprivate class MockBookFetcher: BookFetcher {
     func fetch(_ query: BookQuery) async throws -> BookPagePayload {
         BookPagePayload(numFound: 3, start: 0, docs: [
-            BookPayload(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: nil, firstPublishYear: 1925, coverI: 388076),
-            BookPayload(title: "Tender Is the Night", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780684801544"], subject: nil, firstPublishYear: 1934, coverI: 258027),
-            BookPayload(title: "This Side of Paradise", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780486289991"], subject: nil, firstPublishYear: 1920, coverI: 258024),
+            BookPayload(key: "/works/abc", title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: nil, firstPublishYear: 1925, coverI: 388076),
+            BookPayload(key: "/works/efg", title: "Tender Is the Night", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780684801544"], subject: nil, firstPublishYear: 1934, coverI: 258027),
+            BookPayload(key: "/works/hij", title: "This Side of Paradise", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780486289991"], subject: nil, firstPublishYear: 1920, coverI: 258024),
         ])
     }
     func buildFetchURL(_ query: BookQuery) -> URL? { nil }
@@ -99,7 +99,7 @@ fileprivate typealias MockBookStore = NoopBookStore
     NavigationStack {
         AuthorBooksView(
             bookRepo: BookRepository(bookFetcher: MockBookFetcher(), bookStore: MockBookStore()),
-            source: BookRecord(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: nil, firstPublishYear: 1925, coverI: 388076, timestamp: Date())
+            source: BookRecord(key: "/works/abc", title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: nil, firstPublishYear: 1925, coverI: 388076, timestamp: Date())
         )
     }
 }

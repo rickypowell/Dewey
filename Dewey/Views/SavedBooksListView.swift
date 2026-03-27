@@ -79,6 +79,7 @@ fileprivate struct DeleteBookButton: View {
         Button("Delete", systemImage: "trash", role: .destructive) {
             action()
         }
+        .tint(.red)
     }
 }
 
@@ -95,6 +96,7 @@ fileprivate struct MockBookStore: BookStore {
         let coupleOfDaysAgo = cal.date(byAdding: .day, value: -1, to: now)!
         return [
             BookRecord(
+                key: "/works/abc",
                 title: "Emma",
                 authorName: ["Jane Austen"],
                 authorKey: ["abccd"],
@@ -105,6 +107,7 @@ fileprivate struct MockBookStore: BookStore {
                 timestamp: coupleOfDaysAgo,
             ),
             BookRecord(
+                key: "/works/efg",
                 title: "Sense and Sensibility",
                 authorName: ["Jane Austen"],
                 authorKey: ["abccd"],
@@ -115,6 +118,7 @@ fileprivate struct MockBookStore: BookStore {
                 timestamp: yesterday,
             ),
             BookRecord(
+                key: "/works/hij",
                 title: "The Odessey",
                 authorName: ["Homer"],
                 authorKey: ["xyz"],

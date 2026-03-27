@@ -68,6 +68,7 @@ fileprivate typealias MockBookStore = NoopBookStore
     BookHeroView(
         bookRepo: BookRepository(bookFetcher: MockBookFetcher(), bookStore: MockBookStore()),
         book: BookRecord(
+            key: "/works/abc",
             title: "The Great Gatsby",
             authorName: ["F. Scott Fitzgerald"],
             authorKey: ["OL27349A"],
