@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 /// This Observable can fetch books using it's given `BookFetcher`.
 /// The data is stored in `var book: [BookPayload]` and is initially empty.
@@ -9,6 +10,7 @@ class BookRepository {
     private(set) var errorMessage: String?
 
     private let bookFetcher: any BookFetcher
+    private let bookStore: any BookStore
     
     enum Token: CustomStringConvertible {
         case title(String)
@@ -27,14 +29,15 @@ class BookRepository {
         }
     }
 
-    init(bookFetcher: any BookFetcher) {
+    init(bookFetcher: any BookFetcher, bookStore: any BookStore) {
         self.bookFetcher = bookFetcher
+        self.bookStore = bookStore
     }
     
-    /// This does not clone the data but the initialized `BookFetcher` is passed to a new
+    /// This does not clone the data but the initialized `BookFetcher` and `BookStore` is passed to a new
     /// instance of `BookRepository`
     func clone() -> BookRepository {
-        BookRepository(bookFetcher: bookFetcher)
+        BookRepository(bookFetcher: bookFetcher, bookStore: bookStore)
     }
     
     func fetchBooks(tokens: [Token]) async {
@@ -67,5 +70,21 @@ class BookRepository {
 
     func coverImageURL(for book: BookPayload) -> URL? {
         bookFetcher.buildBookCoverImageURL(book)
+    }
+    
+    /// Inserts/Saves a record of `BookRecord` given the `BookPayload` in the store
+    func save(book: BookPayload) async throws {
+        let record = BookRecord(from: book)
+        try await bookStore.write([record])
+    }
+    
+    /// Removes a record of `BookRecord` from the store
+    func delete(book: BookRecord) async throws {
+        try await bookStore.delete(book)
+    }
+    
+    /// Essentially, this reads the saved records of `BookRecord` in the store
+    func fetchSavedBooks(_ descriptor: FetchDescriptor<BookRecord>) async throws -> [BookRecord] {
+        try await bookStore.read(descriptor)
     }
 }

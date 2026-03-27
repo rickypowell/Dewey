@@ -1,12 +1,17 @@
 import SwiftUI
 
-struct ContentView: View {
+struct SearchBookView: View {
     @Environment(BookRepository.self) var bookRepo
     @State private var searchText = ""
 
     var body: some View {
         NavigationStack {
             List {
+                if bookRepo.books.count > 1 {
+                    Section {
+                        Text("Too many results, please narrow your search or choose one of the following")
+                    }
+                }
                 ForEach(bookRepo.books, id: \.isbn) { book in
                     NavigationLink(value: book) {
                         HStack {
@@ -48,7 +53,7 @@ struct ContentView: View {
             .navigationDestination(for: BookPayload.self) { book in
                 BookDetailView(book: book)
             }
-            .navigationTitle("Books")
+            .navigationTitle("Seach")
             .searchable(text: $searchText, prompt: "Search books")
             .onSubmit(of: .search) {
                 Task {
@@ -85,11 +90,14 @@ fileprivate class MockBookFetcher: BookFetcher {
     }
 }
 
+fileprivate typealias MockBookStore = NoopBookStore
+
 #Preview {
-    ContentView()
+    SearchBookView()
         .environment(
             BookRepository(
-                bookFetcher: MockBookFetcher()
+                bookFetcher: MockBookFetcher(),
+                bookStore: MockBookStore(),
             )
         )
 }

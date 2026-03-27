@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct AuthorBooksView: View {
     @State private var bookRepo: BookRepository
@@ -92,10 +93,12 @@ fileprivate class MockBookFetcher: BookFetcher {
     func buildBookCoverImageURL(_ book: BookPayload) -> URL? { nil }
 }
 
+fileprivate typealias MockBookStore = NoopBookStore
+
 #Preview {
     NavigationStack {
         AuthorBooksView(
-            bookRepo: BookRepository(bookFetcher: MockBookFetcher()),
+            bookRepo: BookRepository(bookFetcher: MockBookFetcher(), bookStore: MockBookStore()),
             source: BookPayload(title: "The Great Gatsby", authorName: ["F. Scott Fitzgerald"], authorKey: ["OL27349A"], isbn: ["9780743273565"], subject: nil, firstPublishYear: 1925, coverI: 388076)
         )
     }

@@ -62,9 +62,11 @@ fileprivate class MockBookFetcher: BookFetcher {
     func buildBookCoverImageURL(_ book: BookPayload) -> URL? { nil }
 }
 
+fileprivate typealias MockBookStore = NoopBookStore
+
 #Preview(traits: .sizeThatFitsLayout) {
     BookHeroView(
-        bookRepo: BookRepository(bookFetcher: MockBookFetcher()),
+        bookRepo: BookRepository(bookFetcher: MockBookFetcher(), bookStore: MockBookStore()),
         book: BookPayload(
             title: "The Great Gatsby",
             authorName: ["F. Scott Fitzgerald"],

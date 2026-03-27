@@ -1,8 +1,14 @@
 import SwiftUI
+import SwiftData
+import os
+
+fileprivate let logger = Logger(subsystem: "com.ricky-powell.Dewey", category: "BookDetilView")
 
 struct BookDetailView: View {
     @Environment(BookRepository.self) private var bookRepo
     let book: BookPayload
+    @State private var bookSaved = false
+    @State private var showSaveError = false
 
     var body: some View {
         ScrollView {
@@ -35,6 +41,26 @@ struct BookDetailView: View {
         }
         .navigationTitle(book.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    Task {
+                        do {
+                            try await bookRepo.save(book: book)
+                            bookSaved = true
+                        } catch {
+                            showSaveError = true
+                        }
+                    }
+                } label: {
+                    Image(systemName: bookSaved ? "checkmark" : "plus")
+                }
+                .disabled(bookSaved)
+            }
+        }
+        .alert(isPresented: $showSaveError, error: BookStoreError.couldNotSave) {
+            // do nothing. Here for debug for now.
+        }
     }
 
 }
@@ -48,6 +74,8 @@ fileprivate class MockBookFetcher: BookFetcher {
     func buildBookCoverImageURL(_ book: BookPayload) -> URL? { nil }
 }
 
+fileprivate typealias MockBookStore = NoopBookStore
+
 #Preview {
     NavigationStack {
         BookDetailView(book: BookPayload(
@@ -60,6 +88,6 @@ fileprivate class MockBookFetcher: BookFetcher {
             coverI: 388076
         ))
     }
-    .environment(BookRepository(bookFetcher: MockBookFetcher()))
+    .environment(BookRepository(bookFetcher: MockBookFetcher(), bookStore: MockBookStore()))
 }
 #endif
