@@ -15,21 +15,14 @@ struct SavedBooksListView: View {
     var body: some View {
         List {
             ForEach(Array(books.enumerated()), id: \.offset) { (index, book) in
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(book.title)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                    
-                    if let authorName = book.authorName.first {
-                        Text(authorName)
-                            .font(.body)
-                            .fontWeight(.medium)
-                    }
-                    
-                    Text(book.timestamp.formatted(date: .abbreviated, time: .shortened))
-                        .foregroundStyle(.secondary)
-                        .font(.caption)
-                }
+                BookListItemView(
+                    book: .init(
+                        url: nil,
+                        title: book.title,
+                        authorName: book.authorName.joined(separator: ", "),
+                        firstPublishYear: book.firstPublishYear,
+                    ),
+                )
                 .swipeActions {
                     Button("Delete", systemImage: "trash.circle") {
                         Task {

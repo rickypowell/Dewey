@@ -16,35 +16,14 @@ struct SearchBookView: View {
                 }
                 ForEach(bookRepo.books, id: \.isbn) { book in
                     NavigationLink(value: book) {
-                        HStack {
-                            if let url = bookRepo.coverImageURL(for: book) {
-                                AsyncImage(url: url) { phase in
-                                    if let image = phase.image {
-                                        image.resizable().aspectRatio(contentMode: .fit)
-                                    } else if phase.error != nil {
-                                        Color.red.opacity(0.3)
-                                    } else {
-                                        Color.gray.opacity(0.3)
-                                    }
-                                }
-                                .frame(width: 50, height: 75)
-                            }
-                            
-                            VStack(alignment: .leading) {
-                                Text(book.title)
-                                    .font(.headline)
-                                    .lineLimit(2)
-                                Text(book.authorName.joined(separator: ", "))
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(2)
-                                if let year = book.firstPublishYear {
-                                    Text(String(year))
-                                        .font(.caption)
-                                        .foregroundStyle(.tertiary)
-                                }
-                            }
-                        }
+                        BookListItemView(
+                            book: .init(
+                                url: bookRepo.coverImageURL(for: book),
+                                title: book.title,
+                                authorName: book.authorName.joined(separator: ", "),
+                                firstPublishYear: book.firstPublishYear,
+                            )
+                        )
                     }
                     .swipeActions {
                         Button("Add to Reading List", systemImage: "plus.circle", role: .confirm) {
